@@ -493,6 +493,10 @@ void conker::qol::set_player_buttons(uint16_t buttons) {
     player_buttons = buttons;
 }
 
+uint16_t conker::qol::get_player_buttons() {
+    return player_buttons.load();
+}
+
 // Hold to Skip in the game over: A pressed and let go in turn (a few frames each, as the game takes presses) until
 // the game over is no longer playing (to the menu), so that press can't reach the menu's PLAY.
 uint16_t conker::qol::apply_skip_press(uint16_t buttons) {
