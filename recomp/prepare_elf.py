@@ -457,7 +457,14 @@ def main(src, dst, symbol_lists=None, originals=None):
     # command 4 (read: 2 bytes out, 8 in) and 0x151DD4E0 command 5 (write: 10 out,
     # 1 in). N64Recomp replaces these libultra functions by name, so every save
     # read the EEPROM over the game's buffer and every load wrote it.
-    corrected = {0x151DD140: "osEepromRead", 0x151DD304: "__osPackEepReadData",
+    # The old decomp also swaps the motor initializer and its packet builder, and
+    # leaves several duplicate OS entry points unnamed. Route those through the
+    # runtime instead of emitting calls to ignored hardware-only SI/timer helpers.
+    corrected = {0x100057E0: "osMotorInit", 0x10005948: "_MakeMotorData",
+                 0x151EF090: "osContInit", 0x151EF9C0: "osSetTimer",
+                 0x151DD460: "osEepromProbe", 0x151DD710: "__osEepStatus",
+                 0x10026700: "__osSiRawReadIo", 0x10026750: "__osSiRawWriteIo",
+                 0x151DD140: "osEepromRead", 0x151DD304: "__osPackEepReadData",
                  0x151DD4E0: "osEepromWrite", 0x151DD65C: "__osPackEepWriteData"}
     for s in syms:
         if (s["info"] & 0xF) == STT_FUNC and corrected.get(s["value"], s["name"]) != s["name"]:
